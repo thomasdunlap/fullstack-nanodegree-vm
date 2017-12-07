@@ -22,7 +22,7 @@ def connect(db="tournament"):
     try:
         yield {'connection': connection, 'cursor': cursor}
     finally:
-        connection.close() 
+        connection.close()
 
 
 def deleteMatches():
@@ -37,10 +37,17 @@ def deletePlayers():
     """Remove all the player records from the database."""
     with connect() as database:
         query = "DELETE FROM players;"
-        data
+        database['cursor'].execute(query)
+        database['connection'].commit()
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    with connect() as database:
+        query = "SELECT COUNT(*) FROM players;"
+        database['cursor'].execute(query)
+        count = database['cursor'].fetchone()[0]
+
+    return count
 
 
 def registerPlayer(name):
