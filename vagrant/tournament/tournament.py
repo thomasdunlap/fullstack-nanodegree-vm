@@ -3,16 +3,26 @@
 # tournament.py -- implementation of a Swiss-system tournament
 #
 from random import shuffle
-#from contextlib import contextmanager
+from contextlib import contextmanager
 
 import psycopg2
 import itertools
 
 
 #@contextmanager
-def connect():
+def connect(db="tournament"):
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    try:
+        connection = psycopg2.connect("dbname={}".format(db))
+        cursor = connection.cursor()
+    except psycopg2.Error:
+        print "Could not connect to database: {}".format(db)
+        raise
+
+    try:
+        yield {'connection': connection, 'cursor': cursor}
+    finally:
+        connection.close() 
 
 
 def deleteMatches():
@@ -21,11 +31,13 @@ def deleteMatches():
         query = "TRUNCATE matches;"
         database['cursor'].execute(query)
         database['connection'].commit()
-        
+
 
 def deletePlayers():
     """Remove all the player records from the database."""
-
+    with connect() as database:
+        query = "DELETE FROM players;"
+        data
 
 def countPlayers():
     """Returns the number of players currently registered."""
