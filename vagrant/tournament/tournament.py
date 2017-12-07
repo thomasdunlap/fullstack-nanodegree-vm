@@ -79,6 +79,18 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    query = ("SELECT num_matches_wins.id, players.name, num_matches_wins.wins, "
+            " num_matches_wins.matches "
+            "FROM players, num_matches_wins "
+            "WHERE players.id = num_matches_wins.id "
+            "ORDER BY num_matches_wins.wins desc;")
+
+    with connect() as database:
+        database['cursor'].execute(query)
+        standings = [(int(row[0]), str(row[1]), int(row[2]), int(row[3]))
+                     for row in database['cursor'].fetchall()]
+
+    return standings
 
 
 def reportMatch(winner, loser):
