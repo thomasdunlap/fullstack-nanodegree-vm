@@ -93,14 +93,33 @@ def playerStandings():
     return standings
 
 
-def reportMatch(winner, loser):
+def reportMatch(winner, loser=None):
     """Records the outcome of a single match between two players.
 
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    with connect() as database:
+        if loser is None:
+            # bye given to winner, and check if winner had bye already
+            query = "SELECT had_bye FROM players WHERE id=%s"
+            parameter = (winner,)
+            database['cursor'].execute(query, parameter)
+            had_bye = database['cursor'].fetchone()[0]
 
+            if had_bye is True:
+                print "Error: Player has already had a bye."
+                return
+
+            # Update had_bye
+            query = "UPDATE players SET had_bye=TRUE WHERE id=%s"
+            database['cursor'].execute(query, parameter)
+
+    query = "INSERT INTO matches (winner _pid, loser_pid) VALUES (%s, %s);"
+    parameter = (winner, loser)
+    database['cursor'].execute(query, parameter)
+    database['connection'].commit()
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
