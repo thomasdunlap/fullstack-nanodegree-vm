@@ -136,3 +136,32 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    standings = [(row[0], row[1]) for row in playerStandings()]
+    pairings = []
+
+    # if odd number of players, assign a bye game to a worst player
+    if (len(standings) % 2 != 0):
+        for worst_player in reversed(standings):
+            reportMatch(worst_player[0], 0)
+            standings.remove(worst_player)
+            break
+
+    num_of_games = len(standings) / 2
+    # print "num_of_games: %d" % num_of_games
+
+    for k in range(0, num_of_games):
+        for i in range(0, len(standings) - 1):
+            player1_id = standings[i][0]
+            player1_name = standings[i][1]
+
+            j = i + 1
+            if j < len(standings):
+                player2_id = standings[j][0]
+                player2_name = standings[j][1]
+                pairings.append((player1_id, player1_name, player2_id, player2_name))
+                standings.remove((player1_id, player1_name))
+                standings.remove((player2_id, player2_name))
+                break
+
+    #print "pairings: %s" % pairings
+    return pairings
