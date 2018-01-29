@@ -29,7 +29,7 @@ CREATE TABLE matches (
 	CHECK (winner <> loser)
 );
 
--- View to see winners
+-- View to see wins
 CREATE VIEW wins
 AS
 	SELECT players.id, players.name, count(matches.winner) AS wins
@@ -37,3 +37,23 @@ AS
 	WHERE players.id != 0
 	GROUP BY players.id, players.name
 	ORDER BY wins DESC;
+
+-- View losses
+CREATE VIEW losses
+AS
+	SELECT players.id, players.name, count(matches.loser) AS losses
+	FROM players LEFT JOIN matches ON players.id = matches.loser
+	WHERE players.id != 0
+	GROUP BY players.id, players.name
+	ORDER BY losses DESC;
+
+CREATE VIEW standings
+AS
+  	SELECT wins.id,
+  		   wins.name,
+  		   wins.wins,
+  		   wins.wins + losses.losses AS matches
+  	FROM wins,
+  		   losses
+  	WHERE wins.id = losses.id
+  	ORDER BY wins DESC;
