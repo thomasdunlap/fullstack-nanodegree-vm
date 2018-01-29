@@ -28,3 +28,12 @@ CREATE TABLE matches (
 	loser INT REFERENCES players(id) ON DELETE CASCADE,
 	CHECK (winner <> loser)
 );
+
+-- View to see winners
+CREATE VIEW wins
+AS
+	SELECT players.id, players.name, count(matches.winner) AS wins
+	FROM players LEFT JOIN matches ON players.id = matches.winner
+	WHERE players.id != 0
+	GROUP BY players.id, players.name
+	ORDER BY wins DESC;
