@@ -21,3 +21,10 @@ CREATE TABLE players (
 
 -- Make fake player if needed for bye games
 INSERT INTO players VALUES (0, 'bye game');
+
+CREATE TABLE matches (
+	game_id SERIAL PRIMARY KEY,
+	winner INT REFERENCES players(id) ON DELETE CASCADE,
+	loser INT REFERENCES players(id) ON DELETE CASCADE,
+	CHECK (winner <> loser)
+);
